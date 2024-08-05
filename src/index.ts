@@ -20,5 +20,5 @@ app.put('/users/:id', updateUser)
 app.delete('/users/:id', deleteUser)
 
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`)
+    console.log(`[server]: Server is running at http://localhost:${port}`)
 })

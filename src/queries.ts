@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import pkg from 'pg'
-const { Pool } = pkg
+
+import { Pool } from 'pg'
 
 const pool = new Pool({
     user: 'postgres',
