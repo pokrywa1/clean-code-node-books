@@ -1,24 +1,15 @@
-import express from 'express'
-import bodyParser from 'body-parser'
-import {
-    getUsers,
-    getUserById,
-    createUser,
-    updateUser,
-    deleteUser,
-} from './queries'
+import express, { Express, Request, Response } from 'express'
+import dotenv from 'dotenv'
 
-const app = express()
-const port = 3000
+dotenv.config()
 
-app.use(bodyParser.json())
+const app: Express = express()
+const port = process.env.PORT || 3000
 
-app.get('/users', getUsers)
-app.get('/users/:id', getUserById)
-app.post('/users', createUser)
-app.put('/users/:id', updateUser)
-app.delete('/users/:id', deleteUser)
+app.get('/', (req: Request, res: Response) => {
+    res.send('Expressses + TypeScript Server')
+})
 
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`)
+    console.log(`[server]: Server is running at http://localhost:${port}`)
 })
