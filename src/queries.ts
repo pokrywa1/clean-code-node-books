@@ -81,3 +81,77 @@ export const deleteUser = (request: Request, response: Response) => {
         }
     )
 }
+
+export const getBooks = (request: Request, response: Response) => {
+    pool.query('SELECT * FROM books ORDER BY id ASC', (error, results) => {
+        if (error) {
+            response.status(500).json({ error: error.message })
+            return
+        }
+        response.status(200).json(results.rows)
+    })
+}
+
+export const getBookById = (request: Request, response: Response) => {
+    const id = parseInt(request.params.id)
+
+    pool.query('SELECT * FROM books WHERE id = $1', [id], (error, results) => {
+        if (error) {
+            response.status(500).json({ error: error.message })
+            return
+        }
+        response.status(200).json(results.rows)
+    })
+}
+
+export const createBook = (request: Request, response: Response) => {
+    const { title, genre, author_id } = request.body
+
+    console.log(request.body)
+    pool.query(
+        'INSERT INTO books (title, genre, author_id) VALUES ($1, $2, $3) RETURNING *',
+        [title, genre, author_id],
+        (error, results) => {
+            if (error) {
+                response.status(500).json({ error: error.message })
+                return
+            }
+            response.status(201).json(results.rows[0])
+        }
+    )
+}
+
+export const updateBook = (request: Request, response: Response) => {
+    const id = parseInt(request.params.id)
+    const { title, genre, author_id } = request.body
+
+    pool.query(
+        'UPDATE books SET title = $1, genre = $2, author_id = $3 WHERE id = $4 RETURNING *',
+        [title, genre, author_id, id],
+        (error, results) => {
+            if (error) {
+                response.status(500).json({ error: error.message })
+                return
+            }
+            response.status(200).json(results.rows[0])
+        }
+    )
+}
+
+export const deleteBook = (request: Request, response: Response) => {
+    const id = parseInt(request.params.id)
+
+    pool.query(
+        'DELETE FROM books WHERE id = $1 RETURNING *',
+        [id],
+        (error, results) => {
+            if (error) {
+                response.status(500).json({ error: error.message })
+                return
+            }
+            response
+                .status(200)
+                .json({ message: `Book deleted with ID: ${id}` })
+        }
+    )
+}
