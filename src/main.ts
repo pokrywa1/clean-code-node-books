@@ -1,13 +1,23 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Enable validation
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
   const config = new DocumentBuilder()
-    .setTitle('Median')
-    .setDescription('The Median API description')
+    .setTitle('Clean Code Node Books API')
+    .setDescription('The Books API description')
     .setVersion('0.1')
     .build();
 
@@ -17,6 +27,6 @@ async function bootstrap() {
   const port = process.env.PORT ?? 8080;
   await app.listen(port);
   console.log(`🚀 Application is running on: http://localhost:${port}`);
-  console.log(`API is running on: http://localhost:${port}/api`);
+  console.log(`📚 API documentation: http://localhost:${port}/api`);
 }
 bootstrap();
