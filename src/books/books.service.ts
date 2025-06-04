@@ -56,7 +56,7 @@ export class BooksService {
 
   async findByAuthor(authorId: number): Promise<Book[]> {
     // First check if author exists
-    const author = await this.prisma.user.findUnique({
+    const author = await this.prisma.author.findUnique({
       where: { id: authorId },
     });
 

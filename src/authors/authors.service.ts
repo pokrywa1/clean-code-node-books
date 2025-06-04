@@ -3,20 +3,20 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateAuthorDto } from './dto/create-author.dto';
+import { UpdateAuthorDto } from './dto/update-author.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from './entities/user.entity';
+import { Author } from './entities/author.entity';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
-export class UsersService {
+export class AuthorsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createAuthorDto: CreateAuthorDto): Promise<Author> {
     try {
-      return await this.prisma.user.create({
-        data: createUserDto,
+      return await this.prisma.author.create({
+        data: createAuthorDto,
       });
     } catch (error) {
       if (
@@ -24,41 +24,41 @@ export class UsersService {
         error.code === 'P2002'
       ) {
         throw new BadRequestException(
-          `Email ${createUserDto.email} is already taken`,
+          `Email ${createAuthorDto.email} is already taken`,
         );
       }
       throw error;
     }
   }
 
-  async findAll(): Promise<User[]> {
-    return await this.prisma.user.findMany({
+  async findAll(): Promise<Author[]> {
+    return await this.prisma.author.findMany({
       include: {
         books: true,
       },
     });
   }
 
-  async findOne(id: number): Promise<User> {
-    const user = await this.prisma.user.findUnique({
+  async findOne(id: number): Promise<Author> {
+    const author = await this.prisma.author.findUnique({
       where: { id },
       include: {
         books: true,
       },
     });
 
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+    if (!author) {
+      throw new NotFoundException(`Author with ID ${id} not found`);
     }
 
-    return user;
+    return author;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(id: number, updateAuthorDto: UpdateAuthorDto): Promise<Author> {
     try {
-      return await this.prisma.user.update({
+      return await this.prisma.author.update({
         where: { id },
-        data: updateUserDto,
+        data: updateAuthorDto,
         include: {
           books: true,
         },
@@ -68,15 +68,15 @@ export class UsersService {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2025'
       ) {
-        throw new NotFoundException(`User with ID ${id} not found`);
+        throw new NotFoundException(`Author with ID ${id} not found`);
       }
       throw error;
     }
   }
 
-  async remove(id: number): Promise<User> {
+  async remove(id: number): Promise<Author> {
     try {
-      return await this.prisma.user.delete({
+      return await this.prisma.author.delete({
         where: { id },
       });
     } catch (error) {
@@ -84,7 +84,7 @@ export class UsersService {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2025'
       ) {
-        throw new NotFoundException(`User with ID ${id} not found`);
+        throw new NotFoundException(`Author with ID ${id} not found`);
       }
       throw error;
     }

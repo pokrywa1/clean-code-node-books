@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '../../users/entities/user.entity';
+import { Author } from '../../authors/entities/author.entity';
 
 export class Book {
   @ApiProperty({ description: 'Book ID', example: 1 })
@@ -14,6 +14,6 @@ export class Book {
   @ApiProperty({ description: 'Author ID', example: 1 })
   authorId: number;
 
-  @ApiProperty({ description: 'Book author', type: () => User })
-  author?: User;
+  @ApiProperty({ description: 'Book author', type: () => Author })
+  author?: Author;
 }

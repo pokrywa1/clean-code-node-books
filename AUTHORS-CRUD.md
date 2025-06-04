@@ -1,23 +1,23 @@
-# Users CRUD Operations
+# Authors CRUD Operations
 
-This document describes the CRUD (Create, Read, Update, Delete) operations implemented for the Users module.
+This document describes the CRUD (Create, Read, Update, Delete) operations implemented for the Authors module.
 
 ## Overview
 
-The Users module provides complete CRUD operations for managing users in the system. Each user has the following properties:
+The Authors module provides complete CRUD operations for managing authors in the system. Each author has the following properties:
 
 - `id`: Unique identifier (auto-generated)
-- `name`: User's name (max 30 characters)
-- `email`: User's email (max 30 characters, unique)
-- `books`: Related books authored by the user
+- `name`: Author's name (max 30 characters)
+- `email`: Author's email (max 30 characters, unique)
+- `books`: Books written by the author
 
 ## API Endpoints
 
-### 1. Create User
+### 1. Create Author
 
-**POST** `/users`
+**POST** `/authors`
 
-Creates a new user in the system.
+Creates a new author in the system.
 
 **Request Body:**
 
@@ -38,11 +38,11 @@ Creates a new user in the system.
 }
 ```
 
-### 2. Get All Users
+### 2. Get All Authors
 
-**GET** `/users`
+**GET** `/authors`
 
-Retrieves all users with their associated books.
+Retrieves all authors with their associated books.
 
 **Response:**
 
@@ -64,11 +64,11 @@ Retrieves all users with their associated books.
 ]
 ```
 
-### 3. Get User by ID
+### 3. Get Author by ID
 
-**GET** `/users/:id`
+**GET** `/authors/:id`
 
-Retrieves a specific user by their ID, including their books.
+Retrieves a specific author by their ID, including their books.
 
 **Response:**
 
@@ -88,11 +88,11 @@ Retrieves a specific user by their ID, including their books.
 }
 ```
 
-### 4. Update User
+### 4. Update Author
 
-**PATCH** `/users/:id`
+**PATCH** `/authors/:id`
 
-Updates an existing user's information.
+Updates an existing author's information.
 
 **Request Body:**
 
@@ -113,11 +113,11 @@ Updates an existing user's information.
 }
 ```
 
-### 5. Delete User
+### 5. Delete Author
 
-**DELETE** `/users/:id`
+**DELETE** `/authors/:id`
 
-Deletes a user from the system.
+Deletes an author from the system.
 
 **Response:** HTTP 204 No Content
 
@@ -133,15 +133,15 @@ The following validation rules are applied:
 The API handles the following error scenarios:
 
 - **400 Bad Request**: Invalid request data or validation errors
-- **404 Not Found**: User with specified ID not found
+- **404 Not Found**: Author with specified ID not found
 - **409 Conflict**: Email already exists (for create/update operations)
 
 ## Database Schema
 
-The User model in Prisma schema:
+The Author model in Prisma schema:
 
 ```prisma
-model User {
+model Author {
   id     Int     @id @default(autoincrement())
   name   String  @db.VarChar(30)
   email  String  @unique @db.VarChar(30)
@@ -157,31 +157,31 @@ You can test the API using:
 2. **curl commands**:
 
 ```bash
-# Create a user
-curl -X POST http://localhost:8080/users \
+# Create an author
+curl -X POST http://localhost:8080/authors \
   -H "Content-Type: application/json" \
   -d '{"name": "John Doe", "email": "john@example.com"}'
 
-# Get all users
-curl http://localhost:8080/users
+# Get all authors
+curl http://localhost:8080/authors
 
-# Get user by ID
-curl http://localhost:8080/users/1
+# Get author by ID
+curl http://localhost:8080/authors/1
 
-# Update user
-curl -X PATCH http://localhost:8080/users/1 \
+# Update author
+curl -X PATCH http://localhost:8080/authors/1 \
   -H "Content-Type: application/json" \
   -d '{"name": "Jane Doe"}'
 
-# Delete user
-curl -X DELETE http://localhost:8080/users/1
+# Delete author
+curl -X DELETE http://localhost:8080/authors/1
 ```
 
 ## Implementation Details
 
-- **Service Layer**: `UsersService` handles all business logic and database operations
-- **Controller Layer**: `UsersController` handles HTTP requests and responses
-- **DTOs**: `CreateUserDto` and `UpdateUserDto` provide type safety and validation
+- **Service Layer**: `AuthorsService` handles all business logic and database operations
+- **Controller Layer**: `AuthorsController` handles HTTP requests and responses
+- **DTOs**: `CreateAuthorDto` and `UpdateAuthorDto` provide type safety and validation
 - **Database**: Uses Prisma ORM with PostgreSQL
 - **Validation**: Uses class-validator decorators for input validation
 - **Documentation**: Swagger/OpenAPI decorators for automatic API documentation
