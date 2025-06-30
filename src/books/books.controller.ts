@@ -22,6 +22,8 @@ import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { Book } from './entities/book.entity';
+import { PaginationDto } from '../common/dto/pagination.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
 @ApiTags('books')
 @Controller('books')
@@ -45,8 +47,8 @@ export class BooksController {
   @ApiOperation({ summary: 'Get all books' })
   @ApiResponse({
     status: 200,
-    description: 'List of books',
-    type: [Book],
+    description: 'List of books with pagination metadata',
+    type: PaginatedResponseDto<Book>,
   })
   @ApiQuery({
     name: 'author',
@@ -61,16 +63,17 @@ export class BooksController {
     type: 'string',
   })
   findAll(
+    @Query() paginationDto: PaginationDto,
     @Query('author', new ParseIntPipe({ optional: true })) authorId?: number,
     @Query('genre') genre?: string,
-  ): Promise<Book[]> {
+  ): Promise<PaginatedResponseDto<Book>> {
     if (authorId) {
-      return this.booksService.findByAuthor(authorId);
+      return this.booksService.findByAuthor(authorId, paginationDto);
     }
     if (genre) {
-      return this.booksService.findByGenre(genre);
+      return this.booksService.findByGenre(genre, paginationDto);
     }
-    return this.booksService.findAll();
+    return this.booksService.findAll(paginationDto);
   }
 
   @Get(':id')

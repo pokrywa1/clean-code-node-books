@@ -8,10 +8,15 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Book } from './entities/book.entity';
 import { Prisma } from '@prisma/client';
+import { PaginationDto } from '../common/dto/pagination.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
+import { PaginatedService } from '../common/services/paginated.service';
 
 @Injectable()
-export class BooksService {
-  constructor(private prisma: PrismaService) {}
+export class BooksService extends PaginatedService<Book> {
+  constructor(prisma: PrismaService) {
+    super(prisma);
+  }
 
   async create(createBookDto: CreateBookDto): Promise<Book> {
     try {
@@ -31,12 +36,19 @@ export class BooksService {
     }
   }
 
-  async findAll(): Promise<Book[]> {
-    return await this.prisma.book.findMany({
-      include: {
-        author: true,
-      },
-    });
+  async findAll(
+    paginationDto?: PaginationDto,
+  ): Promise<PaginatedResponseDto<Book>> {
+    return this.paginate(
+      paginationDto,
+      (skip, take) =>
+        this.prisma.book.findMany({
+          include: { author: true },
+          skip,
+          take,
+        }),
+      () => this.prisma.book.count(),
+    );
   }
 
   async findOne(id: number): Promise<Book> {
@@ -54,36 +66,45 @@ export class BooksService {
     return book;
   }
 
-  async findByAuthor(authorId: number): Promise<Book[]> {
-    // First check if author exists
-    const author = await this.prisma.author.findUnique({
-      where: { id: authorId },
-    });
-
-    if (!author) {
-      throw new NotFoundException(`Author with ID ${authorId} not found`);
-    }
-
-    return await this.prisma.book.findMany({
-      where: { authorId },
-      include: {
-        author: true,
-      },
-    });
+  async findByAuthor(
+    authorId: number,
+    paginationDto?: PaginationDto,
+  ): Promise<PaginatedResponseDto<Book>> {
+    return this.paginate(
+      paginationDto,
+      (skip, take) =>
+        this.prisma.book.findMany({
+          where: { authorId },
+          include: { author: true },
+          skip,
+          take,
+        }),
+      () => this.prisma.book.count({ where: { authorId } }),
+    );
   }
 
-  async findByGenre(genre: string): Promise<Book[]> {
-    return await this.prisma.book.findMany({
-      where: {
-        genre: {
-          contains: genre,
-          mode: 'insensitive',
-        },
+  async findByGenre(
+    genre: string,
+    paginationDto?: PaginationDto,
+  ): Promise<PaginatedResponseDto<Book>> {
+    const whereCondition = {
+      genre: {
+        contains: genre,
+        mode: 'insensitive' as Prisma.QueryMode,
       },
-      include: {
-        author: true,
-      },
-    });
+    };
+
+    return this.paginate(
+      paginationDto,
+      (skip, take) =>
+        this.prisma.book.findMany({
+          where: whereCondition,
+          include: { author: true },
+          skip,
+          take,
+        }),
+      () => this.prisma.book.count({ where: whereCondition }),
+    );
   }
 
   async update(id: number, updateBookDto: UpdateBookDto): Promise<Book> {

@@ -9,12 +9,15 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { AuthorsService } from './authors.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
 import { Author } from './entities/author.entity';
+import { PaginationDto } from '../common/dto/pagination.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
 @ApiTags('authors')
 @Controller('authors')
@@ -36,9 +39,15 @@ export class AuthorsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all authors' })
-  @ApiResponse({ status: 200, description: 'List of authors', type: [Author] })
-  findAll(): Promise<Author[]> {
-    return this.authorsService.findAll();
+  @ApiResponse({
+    status: 200,
+    description: 'List of authors with pagination metadata',
+    type: PaginatedResponseDto<Author>,
+  })
+  findAll(
+    @Query() paginationDto: PaginationDto,
+  ): Promise<PaginatedResponseDto<Author>> {
+    return this.authorsService.findAll(paginationDto);
   }
 
   @Get(':id')

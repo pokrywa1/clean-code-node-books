@@ -8,10 +8,15 @@ import { UpdateAuthorDto } from './dto/update-author.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Author } from './entities/author.entity';
 import { Prisma } from '@prisma/client';
+import { PaginationDto } from '../common/dto/pagination.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
+import { PaginatedService } from '../common/services/paginated.service';
 
 @Injectable()
-export class AuthorsService {
-  constructor(private prisma: PrismaService) {}
+export class AuthorsService extends PaginatedService<Author> {
+  constructor(prisma: PrismaService) {
+    super(prisma);
+  }
 
   async create(createAuthorDto: CreateAuthorDto): Promise<Author> {
     try {
@@ -31,12 +36,19 @@ export class AuthorsService {
     }
   }
 
-  async findAll(): Promise<Author[]> {
-    return await this.prisma.author.findMany({
-      include: {
-        books: true,
-      },
-    });
+  async findAll(
+    paginationDto?: PaginationDto,
+  ): Promise<PaginatedResponseDto<Author>> {
+    return this.paginate(
+      paginationDto,
+      (skip, take) =>
+        this.prisma.author.findMany({
+          include: { books: true },
+          skip,
+          take,
+        }),
+      () => this.prisma.author.count(),
+    );
   }
 
   async findOne(id: number): Promise<Author> {
