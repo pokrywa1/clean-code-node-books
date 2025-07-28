@@ -11,6 +11,7 @@ import { Prisma } from '@prisma/client';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 import { PaginatedService } from '../common/services/paginated.service';
+import { IsPrismaError } from 'src/common/types/PrismaTypeguard';
 
 @Injectable()
 export class BooksService extends PaginatedService<Book> {
@@ -27,7 +28,10 @@ export class BooksService extends PaginatedService<Book> {
         },
       });
     } catch (error) {
-      if (error.code === 'P2003') {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2003'
+      ) {
         throw new BadRequestException(
           `Author with ID ${createBookDto.authorId} does not exist`,
         );
@@ -117,7 +121,7 @@ export class BooksService extends PaginatedService<Book> {
         },
       });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (IsPrismaError(error)) {
         if (error.code === 'P2025') {
           throw new NotFoundException(`Book with ID ${id} not found`);
         }
@@ -141,7 +145,7 @@ export class BooksService extends PaginatedService<Book> {
         },
       });
     } catch (error) {
-      if (error.code === 'P2025') {
+      if (IsPrismaError(error) && error.code === 'P2025') {
         throw new NotFoundException(`Book with ID ${id} not found`);
       }
       throw error;
