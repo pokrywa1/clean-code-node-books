@@ -1,4 +1,4 @@
-import { IsString, IsEmail, MaxLength } from 'class-validator';
+import { IsString, IsEmail, MaxLength, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateAuthorDto {
@@ -8,6 +8,7 @@ export class CreateAuthorDto {
     example: 'John Doe',
   })
   @IsString()
+  @IsNotEmpty()
   @MaxLength(30)
   name: string;
 
@@ -17,6 +18,7 @@ export class CreateAuthorDto {
     example: 'john@example.com',
   })
   @IsEmail()
+  @IsNotEmpty()
   @MaxLength(30)
   email: string;
 }
